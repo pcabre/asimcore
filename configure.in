@@ -30,7 +30,8 @@ AC_PREFIX_PROGRAM(asimstarter)
 
 AC_CONFIG_AUX_DIR(aux-scripts)
 
-AM_INIT_AUTOMAKE([1.8.3 foreign subdir-objects]) dnl automake version + options
+dnl automake version + options
+AM_INIT_AUTOMAKE([1.8.3 foreign subdir-objects])
 AM_CONFIG_HEADER(include/config.h)
 
 # prevent casual installer from having to deal with Makefile.in etc.
@@ -50,294 +51,6 @@ HOSTOSRELEASE=`uname -r`
 HOSTOSRELEASE_SUBST=`echo $HOSTOSRELEASE | tr ".)(-" "____"`
 
 
-#
-# FIND_QT(<dirs>)
-#
-
-AC_DEFUN([FIND_MOC],[
-    AC_MSG_CHECKING("for Qt moc")
-
-    for dir in $1
-    do
-        for try in $dir/bin $dir/qt/bin $dir/qt $dir $dir/qt3/bin $dir/qt3 
-	do
-          if test -f $try/moc
-          then
-              QTMOCDIR=$try
-              QTMOCBIN=moc-qt4
-              AC_MSG_RESULT("found in $QTMOCDIR")
-              break 2
-          elif test "$asim_cv_enable_qt4" = "yes"
-          then
-              if test -f $try/moc-qt4
-              then
-                  QTMOCDIR=$try
-                  QTMOCBIN=moc-qt4
-              AC_MSG_RESULT("found in $QTMOCDIR")
-              break 2
-	  fi
-          fi
-	done
-	
-    done
-])
-
-AC_DEFUN([FIND_UIC],[
-    AC_MSG_CHECKING("for Qt uic")
-
-    for dir in $1
-    do
-        for try in $dir/qt/bin $dir/bin $dir/qt $dir $dir/qt3/bin $dir/qt3 
-	do
-          if test -f $try/uic
-          then
-              QTUICDIR=$try
-              QTUICBIN=uic
-              AC_MSG_RESULT("found in $QTUICDIR")
-              break 2
-          elif test "$asim_cv_enable_qt4" = "yes"
-          then
-              if test -f $try/uic-qt4
-              then
-                  QTUICDIR=$try
-                  QTUICBIN=uic-qt4
-                  AC_MSG_RESULT("found in $QTUICDIR")
-                  break 2
-              fi
-	  fi
-	done
-	
-    done
-
-])
-
-AC_DEFUN([FIND_QT_LIBS],[
-
-    if test "$asim_cv_enable_qt4" = "yes"
-    then
-        AC_MSG_CHECKING("for Qt 4.x.x libraries")
-        QTLIBS="QtCore QtGui"
-
-    else
-        AC_MSG_CHECKING("for Qt 3.x.x libraries")
-        QTLIBS="qt-mt qt"
-    fi
-
-    for dir in $1
-    do
-        for try in $dir/qt/lib $dir/lib/qt $dir/lib $dir/qt $dir/qt4/lib $dir/lib/qt4 $dir/qt4 $dir/lib64/qt $dir/lib64 $dir/lib64/qt4 $dir/lib64 $dir/qt4 $dir $dir/qt3/lib $dir/lib/qt3 $dir/qt3 
-	do
-
-          for i in $QTLIBS
-          do
-	  
-              if test -f $try/lib$i.a -o -f $try/lib$i.so -o -f $try/lib$i.so.3
-              then
-                  QTLIBDIR=$try
-                  QT=$i
-                  AC_MSG_RESULT("found lib$i in $QTLIBDIR")
-                  break 3
-              fi
-	      
-	  done
-	done
-	
-    done
-    
-])
-
-
-AC_DEFUN([FIND_QT_INCLUDES],[
-    if test "$asim_cv_enable_qt4" = "yes"
-    then
-        AC_MSG_CHECKING("for Qt 4.x.x include files")
-        for dir in $1
-        do
-            for try in $dir/qt/include $dir/include/qt $dir/include $dir/qt $dir $dir/qt3/include $dir/include/qt3 $dir/qt3 $dir/Qt
-	        do
-                if test -f $try/QtCore/QtCore
-                then
-                 QTINCDIR=$try
-                 AC_MSG_RESULT("found in $QTINCDIR")
-                 break 2
-	             fi
-	        done
-        done
-    else
-        AC_MSG_CHECKING("for Qt 3.x.x include files")
-        for dir in $1
-        do
-            for try in $dir/qt/include $dir/include/qt $dir/include $dir/qt $dir $dir/qt3/include $dir/include/qt3 $dir/qt3 $dir/Qt
-	        do
-                if test -f $try/qt.h
-                then
-                 QTINCDIR=$try
-                 AC_MSG_RESULT("found in $QTINCDIR")
-                 break 2
-	             fi
-	        done
-        done
-
-    fi
-        
-])AC_DEFUN([FIND_QT], [
-    qt_available=1;
-
-    AC_SUBST(QT)
-
-    if test "$asim_cv_enable_qt4" = "yes"
-    then
-        FIND_MOC($with_qt_moc $with_qt_dir $QTDIR ${prefix}/lib /usr/local/lib /usr/local /usr/lib /usr / /usr/X11R6)
-    else 
-        FIND_MOC($with_qt_moc $with_qt_dir $QTDIR ${prefix}/lib/qt3 /usr/local/lib /usr/local /usr/lib /usr / /usr/X11R6)
-    fi
-
-    if test "X$QTMOCDIR" = "X"; then
-        echo ""
-        echo "Qt's moc not found! If you have installed Qt in an"
-        echo "unusual place, please use the \"--with-qt-moc=\"" option
-        echo ""
-        echo "****************************************************************"
-        echo "****************************************************************"
-        echo "You don't have QT Library available in this system. Remember"
-        echo "you cannot compile libagt, StripChartViewer and 2Dreams"
-        echo "****************************************************************"
-        echo "****************************************************************"
-        echo ""
-        qt_available=0;
-    fi
-
-    dnl
-    dnl find uic
-    dnl
-
-    if test "$asim_cv_enable_qt4" = "yes"
-    then
-        FIND_UIC($with_qt_uic $with_qt_dir $QTDIR ${prefix}/lib /usr/local/lib /usr/local /usr/lib /usr / /usr/X11R6)
-    else
-        FIND_UIC($with_qt_uic $with_qt_dir $QTDIR ${prefix}/lib/qt3 /usr/local/lib /usr/local /usr/lib /usr / /usr/X11R6)
-    fi
-    if test "X$QTUICDIR" = "X"; then
-        echo ""
-        echo "Qt's uic not found! If you have installed Qt in an"
-        echo "unusual place, please use the \"--with-qt-uic=\"" option
-        echo ""
-        echo "****************************************************************"
-        echo "****************************************************************"
-        echo "You don't have QT Library available in this system. Remember"
-        echo "you cannot compile libagt, StripChartViewer and 2Dreams"
-        echo "****************************************************************"
-        echo "****************************************************************"
-        echo ""
-        qt_available=0;
-    fi
-
-    dnl
-    dnl find qt libraries
-    dnl
-
-    if test "$asim_cv_enable_qt4" = "yes"
-    then
-        FIND_QT_LIBS($with_qt_libs $with_qt_dir $QTDIR ${prefix} /usr/local /usr /usr/X11R6 /usr/lib/x86_64-linux-gnu/ /usr/lib/i386-linux-gnu/)
-    else 
-        FIND_QT_LIBS($with_qt_libs $with_qt_dir $QTDIR ${prefix} /usr/local /usr /usr/X11R6 /usr/lib/qt3/lib64 /usr/lib/x86_64-linux-gnu/ /usr/lib/i386-linux-gnu/)
-    fi
-    if test "X$QTLIBDIR" = "X"
-    then
-        echo ""
-        echo "Qt libs not found! If you have installed Qt in an"
-        echo "unusual place, please use the \"--with-qt-libs=\"" option
-        echo ""
-        echo "****************************************************************"
-        echo "****************************************************************"
-        echo "You don't have QT Library available in this system. Remember"
-        echo "you cannot compile libagt, StripChartViewer and 2Dreams"
-        echo "****************************************************************"
-        echo "****************************************************************"
-        echo ""
-        qt_available=0;
-    else
-        QTLIBOBJ="-l$QT"
-        QTLIBDIR="-L$QTLIBDIR"
-    fi
-
-    dnl 
-    dnl find qt headers
-    dnl
-
-    if test "$asim_cv_enable_qt4" = "yes"
-    then
-        FIND_QT_INCLUDES($with_qt_includes $with_qt_dir $QTDIR ${prefix}/lib/qt /usr/lib/qt4 /usr/local/qt /usr/lib/qt /usr/include /usr/include/qt /usr/include/qt4 /usr/local/include /usr/X11R6/include/qt4)
-    else
-        FIND_QT_INCLUDES($with_qt_includes $with_qt_dir $QTDIR ${prefix}/lib/qt /usr/lib/qt3 /usr/local/qt /usr/lib/qt /usr/include /usr/include/qt /usr/include/qt3 /usr/local/include /usr/X11R6/include/qt3)
-    fi
-
-    if test "X$QTINCDIR" = "X"
-    then
-        echo ""
-        echo "Qt headers not found! If you have installed Qt in an"
-        echo "unusual place, please use the \"--with-qt-includes=\"" option
-        echo ""
-        echo "****************************************************************"
-        echo "****************************************************************"
-        echo "You don't have QT Library available in this system. Remember"
-        echo "you cannot compile libagt, StripChartViewer and 2Dreams"
-        echo "****************************************************************"
-        echo "****************************************************************"
-        echo ""
-        qt_available=0;
-    else
-        QTINCDIR="-I$QTINCDIR -I$QTINCDIR/Qt -I$QTINCDIR/Qt3Support -I$QTINCDIR/QtGui -I$QTINCDIR/QtCore"
-    fi    
-])
-
-AC_DEFUN([FIND_GUI], [
-
-    AC_PATH_XTRA
-
-    FIND_QT
-
-    if test $qt_available = 1 
-    then
-        AC_SUBST(QTINCDIR)
-        AC_SUBST(QTLIBDIR)
-        AC_SUBST(QTLIBOBJ)
-        AC_SUBST(QTUICDIR)
-        AC_SUBST(QTUICBIN)
-        AC_SUBST(QTMOCDIR)
-        AC_SUBST(QTMOCBIN)
-
-        dnl Configuring AGT defines
-
-        case $HOSTMACHINE in
-        alpha*) 
-       	    X_EXTRA_LIBS="-lXext -lX11" ;;
-        i?86*)
-	    X_EXTRA_LIBS="-ldl -lGL -lXext -lX11 -lXinerama -lXrender" ;;
-        ia64*)
-	    X_EXTRA_LIBS="-ldl -lGL -lXext -lX11 -lXinerama -lXrender" ;;
-        x86_64*)
-	    X_EXTRA_LIBS="-ldl -lGL -lXext -lX11 -lXinerama -lXrender" ;;
-        *)
-            echo "This architecture is not supported" ;
-            exit ;;
-        esac
-    
-        AC_SUBST(X_EXTRA_LIBS)
-    fi
-
-])
-
-
-##
-## with arguments
-##
-
-AC_ARG_WITH(qt-dir,        [  --with-qt-dir=DIR          qt-dir in DIR])
-AC_ARG_WITH(qt-moc,        [  --with-qt-moc=DIR          qt-moc in DIR])
-AC_ARG_WITH(qt-uic,        [  --with-qt-uic=DIR          qt-uic in DIR])
-AC_ARG_WITH(qt-includes,   [  --with-qt-includes=DIR     qt-includes in DIR])
-AC_ARG_WITH(qt-libs,       [  --with-qt-libs=DIR         qt-libs in DIR])
 AC_ARG_WITH(stlport-dir,   [  --with-stlport-dir=DIR     stlport-dir in DIR])
 
 
@@ -386,13 +99,13 @@ AC_CACHE_CHECK([if optimizations should be used] ,
       asim_cv_enable_optimize=yes)
 
 if test $asim_cv_enable_optimize = no; then
-    OPTFLAGS="-g -O0 -fPIC -fno-inline -DQT_DEBUG -DQT_FATAL_ASSERT"
+    OPTFLAGS="-g -O0 -fPIC -fno-inline"
 fi
 if test $asim_cv_enable_optimize = yes; then
-    OPTFLAGS="-g -O2 -fPIC -DQT_DEBUG -DQT_FATAL_ASSERT"
+    OPTFLAGS="-g -O2 -fPIC"
 fi
 if test $asim_cv_enable_optimize = high; then
-    OPTFLAGS="-g -O3 -fPIC -finline-limit=1200 -funroll-loops -fexpensive-optimizations -frerun-loop-opt -DQT_NO_DEBUG -DQT_NO_CHECK"
+    OPTFLAGS="-g -O3 -fPIC -finline-limit=1200 -funroll-loops -fexpensive-optimizations -frerun-loop-opt"
 fi
 AC_SUBST(OPTFLAGS)
 
@@ -528,21 +241,6 @@ esac
 AC_SUBST(ARCHFLAGS)
 
 
-#
-# --enable-qt4
-#
-AC_ARG_ENABLE([qt4],
-      AC_HELP_STRING([--enable-qt4=ARG],
-                     [use qt4 [[ARG=no|yes]] (default=yes)]),
-      asim_cv_enable_qt4=$enableval,
-      asim_cv_enable_qt4=no)
-
-if test $asim_cv_enable_qt4 = "no" -a -x /usr/bin/lsb_release -a "$(lsb_release -s -i)" = "Ubuntu" -a $(lsb_release -s -r | sed 's/\.//') -ge 1110
-then
-    asim_cv_enable_qt4="yes"
-fi
-
-
 # 
 # Check if they have defined the STLPort directory
 #
@@ -622,23 +320,6 @@ AC_PROG_RANLIB
 # tools for building libraries
 #AC_DISABLE_SHARED
 #AC_PROG_LIBTOOL
-# Handle gui-based stuff
-
-AC_ARG_ENABLE([gui],
-      AC_HELP_STRING([--enable-gui=ARG],
-         [build qt gui-based programs [[ARG=no|yes]] (default=yes)]),
-      asim_cv_enable_gui=$enableval,
-      asim_cv_enable_gui=yes)
-
-if test "$asim_cv_enable_gui" = "yes" 
-then
-    NO_GUI=''
-    FIND_GUI()
-else
-    NO_GUI='#'
-    qt_available=0
-fi
-AC_SUBST(NO_GUI)
     
 
 # Define LINK... 
@@ -688,7 +369,7 @@ if test $HOSTOS = "OSF1" ; then
   if test $GNU != 1 ; then
     ASIMCORELIBS="-L/proj/vssad/local/alpha/lib -ltcl -lX11 -lrt -lm -lmld -lbfd -liberty_gcoff -lst -lmld -lexc -lintl"
     # cxx on Tru64 needs this to compile standard iostream right
-    ASIMCOREFLAGS="-DHOST_DUNIX -D__USE_STD_IOSTREAM -DHASH_NAMESPACE=std -DQT_CLEAN_NAMESPACE -DQT_NO_STL -DQ_STRICT_INLINING_RULES"
+    ASIMCOREFLAGS="-DHOST_DUNIX -D__USE_STD_IOSTREAM -DHASH_NAMESPACE=std"
     ASIMCOREINCS="-I/usr/local/include"
     AC_DEFINE(__USE_STD_IOSTREAM, 1,
       [convince DigitalUnix CXX to follow C++ IOstream standard])
@@ -698,7 +379,7 @@ if test $HOSTOS = "OSF1" ; then
     AC_DEFINE(HASH_NAMESPACE, __gnu_cxx, [Hash namespace in GNU CXX is __gnu_cxx])
     ASIMCORELIBS="-L/proj/vssad/local/alpha/lib -ltcl -lX11 -lrt -lm -lmld -lbfd -liberty -lst -lmld -lexc -lintl"
     ASIMCOREINCS="-idirafter /usr/local/include"
-    ASIMCOREFLAGS="-DHOST_DUNIX -DHASH_NAMESPACE=__gnu_cxx -DQT_CLEAN_NAMESPACE -DQT_NO_STL -DQ_STRICT_INLINING_RULES"
+    ASIMCOREFLAGS="-DHOST_DUNIX -DHASH_NAMESPACE=__gnu_cxx"
   fi
   AC_SUBST(ASIMCOREFLAGS)
   AC_SUBST(ASIMCORELIBS)
@@ -707,10 +388,10 @@ else
   if test $HOSTOS = "FreeBSD" ; then
     case $HOSTMACHINE in
       i?86) 
-        ASIMCOREFLAGS="-DHOST_FREEBSD_X86 -DQT_CLEAN_NAMESPACE -DQT_NO_STL -DQ_STRICT_INLINING_RULES" ;
+        ASIMCOREFLAGS="-DHOST_FREEBSD_X86" ;
         AC_DEFINE(HOST_FREEBSD_X86, 1, [system is FreeBSD x86]) ;;
       *)    
-        ASIMCOREFLAGS="-DHOST_FREEBSD -DQT_CLEAN_NAMESPACE -DQT_NO_STL -DQ_STRICT_INLINING_RULES" ;
+        ASIMCOREFLAGS="-DHOST_FREEBSD" ;
         AC_DEFINE(HOST_FREEBSD, 1, [system is FreeBSD (other)]) ;;
     esac
     
@@ -721,17 +402,17 @@ else
     AC_DEFINE(HASH_NAMESPACE, __gnu_cxx, [Hash namespace in GNU CXX is __gnu_cxx])
     case $HOSTMACHINE in
       i?86*) 
-        ASIMCOREFLAGS="-DHOST_LINUX_X86 -DLINUX_$HOSTOSRELEASE_SUBST -D__STDC_LIMIT_MACROS -DHASH_NAMESPACE=__gnu_cxx -DQT_CLEAN_NAMESPACE -DQT_NO_STL -DQ_STRICT_INLINING_RULES" ;
+        ASIMCOREFLAGS="-DHOST_LINUX_X86 -DLINUX_$HOSTOSRELEASE_SUBST -D__STDC_LIMIT_MACROS -DHASH_NAMESPACE=__gnu_cxx" ;
         ASIMCORELIBS="-L/usr/X11R6/lib -lX11 -ldl -lm -lpthread -lz"
         ASIMCOREINCS="-idirafter /usr/local/include" ;
         AC_DEFINE(HOST_LINUX_X86, 1, [system is Linux x86]) ;;
       x86_64*) 
-        ASIMCOREFLAGS="-DHOST_LINUX_X86 -DLINUX_$HOSTOSRELEASE_SUBST -D__STDC_LIMIT_MACROS -DHASH_NAMESPACE=__gnu_cxx -DQT_CLEAN_NAMESPACE -DQT_NO_STL -DQ_STRICT_INLINING_RULES" ;
+        ASIMCOREFLAGS="-DHOST_LINUX_X86 -DLINUX_$HOSTOSRELEASE_SUBST -D__STDC_LIMIT_MACROS -DHASH_NAMESPACE=__gnu_cxx" ;
         ASIMCORELIBS="-L/usr/X11R6/lib64 -lX11 -ldl -lm -lpthread -lz"
         ASIMCOREINCS="-idirafter /usr/local/include" ;
         AC_DEFINE(HOST_LINUX_X86, 1, [system is Linux x86-64]) ;;
       ia64*) 
-        ASIMCOREFLAGS="-DHOST_LINUX_IA64 -DLINUX_$HOSTOSRELEASE_SUBST -DHASH_NAMESPACE=__gnu_cxx -DQT_CLEAN_NAMESPACE -DQT_NO_STL -DQ_STRICT_INLINING_RULES" ;
+        ASIMCOREFLAGS="-DHOST_LINUX_IA64 -DLINUX_$HOSTOSRELEASE_SUBST -DHASH_NAMESPACE=__gnu_cxx" ;
         ASIMCORELIBS="-L/usr/X11R6/lib -lX11 -ldl -lm -lpthread -lz" ;
         ASIMCOREINCS="-idirafter /usr/local/include" ;
         AC_DEFINE(HOST_LINUX_IA64, 1, [system is Linux IA64]) ;;
@@ -741,13 +422,6 @@ else
   AC_SUBST(ASIMCORELIBS)
   AC_SUBST(ASIMCOREINCS)
 fi
-
-#
-# libtool on SUSE x86_64 installations does not look for -lpopt in the right place,
-# so we define this conditional, used in the makefiles for awb-resolver, amc, and dbtest,
-# which forces an explicit link command not using libtool
-#
-AM_CONDITIONAL(X86_64_LIBTOOL_HACK, test x$SYSTOKEN = xx86_64_linux26)
 
 # Checks for libraries.
 AC_CHECK_LIB(popt, poptGetContext)
@@ -801,25 +475,6 @@ AC_CONFIG_FILES(lib/libdral/pkgconfig/libdral-uninstalled.pc)
 AC_CONFIG_FILES(lib/libnullptlib/Makefile lib/libnullptlib/include/Makefile)
 AC_CONFIG_FILES(lib/libnullptlib/pkgconfig/libnullptlib.pc)
 AC_CONFIG_FILES(lib/libnullptlib/pkgconfig/libnullptlib-uninstalled.pc)
-
-# tools/dreams
-
-if test $qt_available = 1; then
-    AC_CONFIG_FILES(lib/libagt/Makefile lib/libagt/include/Makefile)
-    AC_CONFIG_FILES(lib/libdraldb/Makefile lib/libdraldb/include/Makefile)
-    AC_CONFIG_FILES(tools/dreams/Makefile)
-    AC_CONFIG_FILES(tools/dreams/dbtest/Makefile tools/dreams/dbtest/src/Makefile)
-else
-    echo ""
-    echo "*******************************************************************"
-    echo "*******************************************************************"
-    echo "You don't have the QT Library configured. Therefore,"
-    echo "StripChartViewer, 2Dreams, ligdreams, dralTranslator and libagt"
-    echo "will not be compiled"
-    echo "*******************************************************************"
-    echo "*******************************************************************"
-    echo ""
-fi
 
 # Default model Makefile and Makefile.config
 AC_CONFIG_FILES(modules/Makefile.template)

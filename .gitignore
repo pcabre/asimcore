@@ -29,36 +29,6 @@
 # /lib/
 /lib/Makefile
 
-# /lib/libagt/
-/lib/libagt/libagt.a
-/lib/libagt/Makefile
-
-# /lib/libagt/include/
-/lib/libagt/include/Makefile
-
-# /lib/libagt/src/
-/lib/libagt/src/snapDialogImpl_moc.cpp
-/lib/libagt/src/AnnotationText_moc.cpp
-/lib/libagt/src/Main_moc.cpp
-/lib/libagt/src/bookmarkImpl_moc.cpp
-/lib/libagt/src/AnnotationRect_moc.cpp
-/lib/libagt/src/.deps
-/lib/libagt/src/AnnotationCircle_moc.cpp
-/lib/libagt/src/AnnotationCtrl_moc.cpp
-/lib/libagt/src/AnnotationLine_moc.cpp
-/lib/libagt/src/AnnotationItem_moc.cpp
-/lib/libagt/src/AColorDialog_moc.cpp
-/lib/libagt/src/BookmarkMgr_moc.cpp
-/lib/libagt/src/AnnotationContainer_moc.cpp
-/lib/libagt/src/HelpWindow_moc.cpp
-/lib/libagt/src/snapDialog_moc.cpp
-/lib/libagt/src/AScrollView_moc.cpp
-/lib/libagt/src/Q2DMAction_moc.cpp
-/lib/libagt/src/MDIWindow_moc.cpp
-/lib/libagt/src/bookmark_moc.cpp
-/lib/libagt/src/AnnotationAutoBezierArrow_moc.cpp
-/lib/libagt/src/.dirstamp
-
 # /lib/libasim/
 /lib/libasim/libasim.a
 /lib/libasim/Makefile
@@ -94,17 +64,6 @@
 /lib/libdral/src/dralTar.cpp
 /lib/libdral/src/.dirstamp
 
-# /lib/libdraldb/
-/lib/libdraldb/Makefile
-/lib/libdraldb/libdraldb.a
-
-# /lib/libdraldb/include/
-/lib/libdraldb/include/Makefile
-
-# /lib/libdraldb/src/
-/lib/libdraldb/src/.deps
-/lib/libdraldb/src/.dirstamp
-
 # /lib/libnullptlib/
 /lib/libnullptlib/Makefile
 /lib/libnullptlib/libnullptlib.a
@@ -129,13 +88,6 @@
 
 # /tools/dreams/
 /tools/dreams/Makefile
-
-# /tools/dreams/dbtest/
-/tools/dreams/dbtest/Makefile
-
-# /tools/dreams/dbtest/src/
-/tools/dreams/dbtest/src/.deps
-/tools/dreams/dbtest/src/Makefile
 
 # /tools/scripts/
 /tools/scripts/asimstarter

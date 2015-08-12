@@ -28,5 +28,5 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-DIST_SUBDIRS=libasim libdral libnullptlib @NO_GUI@
-SUBDIRS=libasim libdral libnullptlib  @NO_GUI@
+DIST_SUBDIRS=libasim libdral libnullptlib
+SUBDIRS=libasim libdral libnullptlib
